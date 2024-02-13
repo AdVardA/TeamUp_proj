@@ -2,10 +2,18 @@ from django.contrib.auth.models import User
 from datetime import datetime
 
 from django import forms
+#to implement a user registration page on Django using UserCreationForm
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 from .models import Profile, Univer_Profile, Club_Profile, Open_Position_for_Un, Open_Position_for_Cl, Extra_Languages, \
     Achivment, Teem
 
+class SignupForm(UserCreationForm):
+    email = forms.EmailField(max_length=200, help_text='Required')
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2')
 
 class User_Form_Reg(forms.ModelForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control ps-5'}))
