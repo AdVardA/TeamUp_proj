@@ -17,6 +17,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT = 'static/Users/data/photos/'
 MEDIA_URL = ''
 
+#Configuring email host server for sending confirmation email using gmail smtp host server
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'youremail@gmail.com'
+EMAIL_HOST_PASSWORD = 'yourpassword'
+EMAIL_PORT = 587
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
