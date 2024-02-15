@@ -28,6 +28,8 @@ from .tokens import account_activation_token
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 
+import random
+
 def signup(request):
     if request.method = 'POST':
         form = SignUpForm(request.POST)
@@ -44,6 +46,9 @@ def signup(request):
             return HttpResponse('Please confirm your email address to complete the registration')
         else:
             form = SignuupForm()
+
+        rand = random.randint(0,100000)
+        
         return render(request, 'signup.html',{'form':form})
 
 def activate(request, uidb64, token):
