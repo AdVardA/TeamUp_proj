@@ -9,12 +9,17 @@ from django.dispatch import receiver
 class Small_admin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
+class Unverified_Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    email_flag = models.BooleanField(default=False, blank=False)
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     id = models.IntegerField(primary_key=True)
     user_flag = models.BooleanField(default=False, blank=False)
     is_user = models.BooleanField(default=True, blank=False)
+
 
     # avatar = models.ImageField(upload_to='static/Users/data/photos/',default='static/Users/data/photos/temp.jpg',blank=False)
 

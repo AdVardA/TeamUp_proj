@@ -19,10 +19,10 @@ MEDIA_URL = ''
 
 #Configuring email host server for sending confirmation email using gmail smtp host server
 EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'youremail@gmail.com'
-EMAIL_HOST_PASSWORD = 'yourpassword'
-EMAIL_PORT = 587
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_HOST_USER = 'artnikitin2004@yandex.ru'
+EMAIL_HOST_PASSWORD = 'tiubuvqasjjsfhbq'
+EMAIL_PORT = 25
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/

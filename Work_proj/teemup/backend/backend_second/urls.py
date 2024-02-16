@@ -22,16 +22,16 @@ from TeamedUp import views
 
 from TeamedUp.views import *
 
-from django.conf.urls import url
-from .import views
+#from django.conf.urls import url
+#from .import views
 
 #function to check if it valid then user will active and login. 
-urlpatterns = [
-    url(r'^$', views.home, name='home'),
-    url(r'^signup/$', viewa.signup, name='signup'),
-    url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+"""urlpatterns = [
+    path("test1/", views.home1, name='home'),
+    path("test2/", views.signup, name='signup'),
+    path("test3/",
         views.activate, name='activate'),
-]
+]"""
 
 
 

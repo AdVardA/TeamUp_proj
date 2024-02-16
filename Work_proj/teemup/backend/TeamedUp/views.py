@@ -8,31 +8,33 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout as django_logout
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
 
-from .models import Profile, Univer_Profile, Club_Profile, Open_Position_for_Un
+from .models import Profile, Unverified_Profile, Univer_Profile, Club_Profile, Open_Position_for_Un
 from .models import Achivment, Extra_Languages, Teem
 
 from .forms import UserForm, Un_ProfileForm, Cl_ProfileForm, Un_Position_Form
 from .forms import user_bio_form, user_academy_form, user_sport_form, user_letter_form
 from .forms import User_Lang_Form, User_Ach_Form, User_Teem_Form
 
-from django.http import HttpResponse
+
+"""from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from .forms import SignupForm
 from django.contrib.sites.shortcuts import get_current_site
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_encode,curlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_encode
 from django.template.loader import render_to_string
-from .tokens import account_activation_token
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.models import User
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage"""
 
 import random
 
-def signup(request):
-    if request.method = 'POST':
-        form = SignUpForm(request.POST)
+"""def signup(request):
+    if request.method == 'POST':
+        form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
             user.is_active = False
@@ -45,7 +47,7 @@ def signup(request):
             emailsend()
             return HttpResponse('Please confirm your email address to complete the registration')
         else:
-            form = SignuupForm()
+            form = SignupForm()
 
         rand = random.randint(0,100000)
         
@@ -53,19 +55,19 @@ def signup(request):
 
 def activate(request, uidb64, token):
     try:
-        uid = force_text(urlsafe_base64_decode(uidb64))
+        uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
     except(TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
-        if user is not None and
+        if user is not None and\
     account_activation_token.check_token(user, token):
-        user.is_active = True
-        user.save()
-        login(request, user)
+            user.is_active = True
+            user.save()
+            login(request, user)
         # return redirect('home')
-        return HttpResponse('Thank you for your email confirmation. Now you can login your account')
+            return HttpResponse('Thank you for your email confirmation. Now you can login your account')
         else:
-            return HttpResponse('Activation Link is invalid!')
+                return HttpResponse('Activation Link is invalid!')"""
 
 
 def menu_user():
@@ -445,6 +447,10 @@ class register_view_user(TemplateView):
 def create_user_profile(instance):
     """create profile """
     Profile.objects.create(user=instance)
+
+def create_unverified_user_profile(instance):
+    """create profile """
+    Unverified_Profile.objects.create(user=instance)
 
 
 class register_view_univer(TemplateView):
