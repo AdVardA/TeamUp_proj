@@ -9,6 +9,7 @@ from django.contrib.auth import logout as django_logout
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
+import random
 
 from .models import Profile, Unverified_Profile, Univer_Profile, Club_Profile, Open_Position_for_Un
 from .models import Achivment, Extra_Languages, Teem
@@ -448,8 +449,19 @@ def create_user_profile(instance):
     """create profile """
     Profile.objects.create(user=instance)
 
-def create_unverified_user_profile(instance):
+def code_generator():
+    return str(random.randint(1000000,10000000))
+
+
+def create_unverified_user_profile(instance,email):
     """create profile """
+    send_mail(
+    "TeamedUp project",
+    "You create unverified accaunt. Usw this code "+code_generator+" for verified.",
+    None,
+    [email],
+    fail_silently=False,
+)
     Unverified_Profile.objects.create(user=instance)
 
 
