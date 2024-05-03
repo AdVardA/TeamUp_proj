@@ -51,6 +51,8 @@ urlpatterns = [
 
     path('accounts/logout/', views.login_out, name="logout"),
 
+    path("verefication/", views.verification_code_page, name="ver_code"),
+
     path('accounts/login/', login_view_user.as_view(), name="login"),
     path('accounts/login_Un/', login_view_univer.as_view(), name="login_un"),
     path('accounts/login_Cl/', login_view_club.as_view(), name="login_cl"),

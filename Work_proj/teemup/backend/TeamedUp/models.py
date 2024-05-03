@@ -1,21 +1,47 @@
+import random
+
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+import datetime
+
 
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+def code_generator():
+    return str(random.randint(1000000,10000000))
 
 class Small_admin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
 class Unverified_Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    verificator_counter = models.IntegerField(default=0)
     email_flag = models.BooleanField(default=False, blank=False)
+    def counter(self):
+            return self.verificator_counter
+    def plus_one_to_counter(self):
+        self.verificator_counter+=1
+    def verificate(self):
+        self.email_flag = True
+        self.verificator_counter = 0
 
+#unique add this parametr for unique
+class Verificator(models.Model):
+    owner = models.ForeignKey(Unverified_Profile, on_delete=models.CASCADE, default=0)
+    code = models.IntegerField(default=0)
+    verificator_page_id = models.CharField(default=0, max_length=14)
+    date = models.DateField(default=datetime.datetime.now())
+    time = models.TimeField(default=datetime.datetime.now())
+    def get_code(self):
+        return self.code
+
+    def get_page_id(self):
+        return self.verificator_page_id
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, unique=1)
     id = models.IntegerField(primary_key=True)
     user_flag = models.BooleanField(default=False, blank=False)
     is_user = models.BooleanField(default=True, blank=False)

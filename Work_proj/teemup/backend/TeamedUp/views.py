@@ -7,16 +7,16 @@ from django.views.generic import TemplateView
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout as django_logout
 from django.shortcuts import redirect
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.core.mail import send_mail
 import random
 
-from .models import Profile, Unverified_Profile, Univer_Profile, Club_Profile, Open_Position_for_Un
+from .models import Profile, Unverified_Profile, Verificator, Univer_Profile, Club_Profile, Open_Position_for_Un
 from .models import Achivment, Extra_Languages, Teem
 
 from .forms import UserForm, Un_ProfileForm, Cl_ProfileForm, Un_Position_Form
 from .forms import user_bio_form, user_academy_form, user_sport_form, user_letter_form
-from .forms import User_Lang_Form, User_Ach_Form, User_Teem_Form
+from .forms import User_Lang_Form, User_Ach_Form, User_Teem_Form, Verificator_Form
 
 
 """from django.http import HttpResponse
@@ -32,6 +32,10 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMessage"""
 
 import random
+
+EMAIL_HOST_USER = 'artnikitin2004@yandex.ru'
+WEB_URL = "127.0.0.1:8000/"
+
 
 """def signup(request):
     if request.method == 'POST':
@@ -135,7 +139,12 @@ def web():
 
     ]
 
-
+def code_cache(auth_code, mail):
+    ans = ''
+    code = str(auth_code) + str(auth_code)
+    for i in range(len(code)):
+        ans = ans + str(ord(code[i]) ^ ord(mail[i%len(mail)]))
+    return ans
 def company():
     """info for connect"""
     return [
@@ -234,6 +243,7 @@ def start_user_link():
         'web': web(),
         'company': company(),
         'usfull_links': usfull_links(),
+        'massage':"",
     }
 
 
@@ -435,19 +445,20 @@ class register_view_user(TemplateView):
             password2 = request.POST.get('password2')
 
             if password == password2:
-                User.objects.create_user(str(username), email, password)
+                try:
+                    User.objects.create_user(str(username), email, password)
+                except:
+                    pass
                 first_object = User.objects.get(username=username)
-                create_user_profile(first_object)
-                return redirect(reverse("login"))
+                status = create_unverified_user_profile(first_object,email)
+                if status == 0:
+                    return redirect(reverse("login"))
+                if status == 1:
+                    data["massage"] = "We already send 3 code for you. Please, use them or try later."
                 # data['t']=first_object
                 # return render(request, "accounts/reg.html", data)
 
         return render(request, "accounts/reg.html", data)
-
-
-def create_user_profile(instance):
-    """create profile """
-    Profile.objects.create(user=instance)
 
 def code_generator():
     return str(random.randint(1000000,10000000))
@@ -455,14 +466,79 @@ def code_generator():
 
 def create_unverified_user_profile(instance,email):
     """create profile """
-    send_mail(
-    "TeamedUp project",
-    "You create unverified accaunt. Usw this code "+code_generator+" for verified.",
-    None,
-    [email],
-    fail_silently=False,
-)
-    Unverified_Profile.objects.create(user=instance)
+    try:
+        new_user = Unverified_Profile.objects.create(user=instance)
+    except:
+        new_user = Unverified_Profile.objects.filter(user=instance)
+    verification_code_sender(new_user,email)
+
+
+
+def verification_code_sender(new_user,email):
+    #try:
+    print("\n",email,"\n")
+    if new_user.counter!=3:
+        code = code_generator()
+        print("\n\n\n",code,'\n\n\n')
+        verificator = Verificator.objects.create(owner=new_user, code = code, verificator_page_id = code_cache(code, email))
+        new_user.plus_one_to_counter()
+        send_mail("TeamedUp project","You create unverified accaunt. Usw this code "+code+" for verified."\
+                  +"Page for verefication : "+WEB_URL+"verefication?id="+verificator.get_page_id(),
+                  EMAIL_HOST_USER,
+                  [email],
+                  fail_silently=False)
+        print("127.0.0.1/verefication?id="+verificator.get_page_id())
+    """except:
+        send_mail(
+            "TeamedUp project",
+            "We already send to you 3 codes."+"Please, use last of those.",
+            EMAIL_HOST_USER,
+            [email],
+            fail_silently=False,
+        )"""
+
+"""
+Допсать функцию создающую страницу с полем для ввода индефикатора + сделать страницу обрабатывающую введенный код
+если он правельный то создать профель для юзера
+"""
+def verification_code_page(request):
+    """show user's res"""
+    # 127.0.0.1:8000/Athletes/resume/?id=19
+    data = {}
+    print("\n",request.GET.get('code'),'\n')
+    print(request.POST)
+    if request.POST.get('code') is not None:
+        indicator = request.GET.get('id')
+        print("\n\nindicateor=", indicator, "\n\n")
+        print(request.GET)
+
+        if(len(indicator)<30):
+            ver = Verificator.objects.all().filter(verificator_page_id=indicator).first()
+            data = {}
+            print("\n\n", ver, "\n\n")
+            if ver is not None:
+                code = request.POST.get('code')
+                print("\n\n",code,"\n\n")
+                print("\n\n", isinstance(code, int), "\n\n")
+                print("\n\n", int(code) == ver.get_code(),ver.get_code(), "\n\n")
+                if isinstance(int(code), int):
+                    if int(code) == ver.get_code():
+                        print("\n\n:)")
+                        ver.owner.verificate()
+                        create_user_profile(ver.owner.user)
+                        Unverified_Profile.objects.all().filter(user=ver.owner.user).delete()
+                        return redirect('login')
+                    data["massage"] = "Wrong code."
+
+    form = Verificator_Form()
+
+    data['form'] = form
+    return render(request, 'verification_page.html',data)
+
+def create_user_profile(instance):
+    """create profile """
+    Profile.objects.create(user=instance)
+
 
 
 class register_view_univer(TemplateView):

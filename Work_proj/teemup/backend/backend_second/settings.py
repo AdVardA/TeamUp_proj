@@ -22,7 +22,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_HOST_USER = 'artnikitin2004@yandex.ru'
 EMAIL_HOST_PASSWORD = 'tiubuvqasjjsfhbq'
-EMAIL_PORT = 25
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
