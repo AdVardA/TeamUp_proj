@@ -16,7 +16,7 @@ from .models import Achivment, Extra_Languages, Teem
 
 from .forms import UserForm, Un_ProfileForm, Cl_ProfileForm, Un_Position_Form
 from .forms import user_bio_form, user_academy_form, user_sport_form, user_letter_form
-from .forms import User_Lang_Form, User_Ach_Form, User_Teem_Form, Verificator_Form
+from .forms import User_Lang_Form, User_Ach_Form, User_Teem_Form, Verificator_Form, Reset_password_Form
 
 
 """from django.http import HttpResponse
@@ -546,8 +546,13 @@ class register_view_univer(TemplateView):
 
     def dispatch(self, request, instance=None, *args, **kwargs):
         data = ather_dop_content()
+        print("user enter")
         if request.method == 'POST':
+            print("post == 1")
             username = request.POST.get('username')
+            if username_checker(username):
+                data['error'] = "Please use ather different username."
+                return render(request, "accounts/reg_ather.html", data)
 
             email = request.POST.get('email')
             password = request.POST.get('password')
@@ -598,10 +603,64 @@ class register_view_club(TemplateView):
 
         return render(request, "accounts/reg_ather.html", data)
 
+def username_checker(name):
+    return (User.objects.filter(username=name).exists())
 
 def create_user_profile_cl(instance):
     """create profile cl"""
     Club_Profile.objects.create(id=instance)
+
+
+def before_reset_password(request):
+    data = start_user_link()
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        #print(email)
+        if User.objects.all().filter(email=email).first() is None:
+            data['error'] = "We don't know this email"
+        else:
+            code = code_generator()
+            user=User.objects.filter(email=email).first()
+            print(user)
+            verificator = Verificator.objects.create(owner_for_reset_password=user,owner=None, code=code,verificator_page_id=code_cache(code, email))
+            send_mail("TeamedUp project", "Your link for new password: " + WEB_URL + "reset_pasword?id=" + verificator.get_page_id(),
+                      EMAIL_HOST_USER,
+                      [email],
+                      fail_silently=False)
+            data['massage'] = "We send mail to your email."
+    return render(request, "accounts/before_reset_password.html", data)
+
+
+def reset_password(request):
+    data = start_user_link()
+    data["form"] = Reset_password_Form
+    if request.method == 'POST':
+        id = request.GET.get('id')
+        name = Verificator.objects.filter(verificator_page_id=id).first().owner_for_reset_password
+        user = User.objects.filter(username=name).first()
+        print(user)
+        form = Reset_password_Form( request.POST)
+        #print(email)
+        #print(form.errors)
+        if form.is_valid():
+
+
+            print(id)
+            print()
+            print(user.password)
+            #print(form.get_initial_for_field(form.fields['passw'],"passw"))
+            print(form.cleaned_data.get("Password"))
+            p_=form.cleaned_data.get("Password")
+            user.set_password(p_)
+            user.save()
+            print()
+            print(user.password,user.check_password(p_))
+            Verificator.objects.filter(verificator_page_id=id).first().delete()
+            data['massage'] = "We change your password."
+            return render(request, 'start.html', data)
+        else:
+            data['error'] =  form.errors
+    return render(request, "accounts/reset_password.html", data)
 
 
 class profile_page_user(TemplateView):
@@ -669,7 +728,6 @@ def update_profile_user(request):
             temp.user_flag = True
             temp.save()
             bio_form.save()
-            # messages.success(request, ('Ваш профиль был успешно обновлен!'))
         else:
             data['error2'] = '2'
 
@@ -685,7 +743,6 @@ def update_profile_user(request):
             temp.user_flag = True
             temp.save()
             academy_form.save()
-            # messages.success(request, ('Ваш профиль был успешно обновлен!'))
         else:
             data['error3'] = '3'
 
@@ -698,7 +755,6 @@ def update_profile_user(request):
         if sport_form.is_valid() and flag:
             #            Profile.objects.filter(id=request.user.profile.id).update(user_flag=True)
             sport_form.save()
-            # messages.success(request, ('Ваш профиль был успешно обновлен!'))
         else:
             data['error4'] = '4'
 
@@ -781,7 +837,6 @@ def update_profile_univer(request):
             un_form.save()
             flag = True
 
-            # messages.success(request, ('Ваш профиль был успешно обновлен!'))
         else:
             data['error2'] = '3'
 
@@ -825,7 +880,6 @@ def update_profile_club(request):
             temp.flag = True
             temp.save()
             cl_form.save()
-            # messages.success(request, ('Ваш профиль был успешно обновлен!'))
         else:
             data['error2'] = '4'
 
@@ -901,7 +955,6 @@ def set_position_univer(request):
             tem.teem_name = teem_name
             tem.save()
             un_pos_form.save()
-            # messages.success(request, ('Ваш профиль был успешно обновлен!'))
         else:
             data['error2'] = '4'
 
@@ -974,7 +1027,6 @@ def set_lang_user(request):
             id=request.GET.get('id')).first())
         if un_lan_form.is_valid() and flag:
             un_lan_form.save()
-            # messages.success(request, ('Ваш профиль был успешно обновлен!'))
         else:
             data['error2'] = '4'
 
@@ -1012,7 +1064,6 @@ def set_ach_user(request):
             id=request.GET.get('id')).first())
         if ach_form.is_valid() and flag:
             ach_form.save()
-            # messages.success(request, ('Ваш профиль был успешно обновлен!'))
         else:
             data['error2'] = '4'
 
@@ -1048,7 +1099,6 @@ def set_teem_user(request):
             id=request.GET.get('id')).first())
         if form.is_valid() and flag:
             form.save()
-            # messages.success(request, ('Ваш профиль был успешно обновлен!'))
         else:
             data['error2'] = '4'
 
@@ -1079,7 +1129,6 @@ def set_bio_user(request):
         form = user_bio_form(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid() and flag:
             form.save()
-            # messages.success(request, ('Ваш профиль был успешно обновлен!'))
         else:
             data['error2'] = '4'
 
@@ -1109,7 +1158,6 @@ def set_acd_user(request):
         if form.is_valid() and flag:
             Achivment.flag = True
             form.save()
-            # messages.success(request, ('Ваш профиль был успешно обновлен!'))
         else:
             data['error2'] = '4'
 
@@ -1138,7 +1186,6 @@ def set_sport_user(request):
         form = user_sport_form(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid() and flag:
             form.save()
-            # messages.success(request, ('Ваш профиль был успешно обновлен!'))
         else:
             data['error2'] = '4'
 

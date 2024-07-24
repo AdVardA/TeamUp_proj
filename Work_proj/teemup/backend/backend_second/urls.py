@@ -52,6 +52,8 @@ urlpatterns = [
     path('accounts/logout/', views.login_out, name="logout"),
 
     path("verefication/", views.verification_code_page, name="ver_code"),
+    path("before_reset_pasword/", views.before_reset_password, name="before_reset"),
+    path("reset_pasword/", views.reset_password, name="reset_password"),
 
     path('accounts/login/', login_view_user.as_view(), name="login"),
     path('accounts/login_Un/', login_view_univer.as_view(), name="login_un"),

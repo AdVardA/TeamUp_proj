@@ -7,7 +7,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 from .models import Profile, Univer_Profile, Club_Profile, Open_Position_for_Un, Open_Position_for_Cl, Extra_Languages, \
-    Achivment, Teem
+    Achivment, Teem, Verificator
 
 """class SignupForm(UserCreationForm):
     email = forms.EmailField(max_length=200, help_text='Required')
@@ -340,8 +340,17 @@ class Verificator_Form(forms.ModelForm):
     code = forms.IntegerField(widget=forms.TextInput(attrs={'class': 'form-control ps-5'}))
 
     class Meta:
-        model = Teem
+        model = Verificator
         fields = (
             'code',
+        )
+class Reset_password_Form(forms.ModelForm):
+    Password = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control ps-5','type':"password","placeholder":"Password"}))
+
+    class Meta:
+        model = User
+        fields = (
+            'Password',
+
         )
 

@@ -64,6 +64,8 @@ class Profel_id(admin.ModelAdmin):
             })
     )
     inlines = [Ach,Extr_L,Tee]
+    for i in inlines:
+        i.readonly_fields = ('id',)
 
 
 class Univer_Profile_id(admin.ModelAdmin):
@@ -100,7 +102,7 @@ class Unverified_Profile_id(admin.ModelAdmin):
     inlines = [Ver]
 
 class Verificator_id(admin.ModelAdmin):
-    readonly_fields = ('id','owner','code','date','time','verificator_page_id')
+    readonly_fields = ('id','owner','owner_for_reset_password','code','date','time','verificator_page_id')
 
 
 admin.site.register(Profile, Profel_id)

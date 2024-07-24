@@ -29,7 +29,8 @@ class Unverified_Profile(models.Model):
 
 #unique add this parametr for unique
 class Verificator(models.Model):
-    owner = models.ForeignKey(Unverified_Profile, on_delete=models.CASCADE, default=0)
+    owner = models.ForeignKey(Unverified_Profile, on_delete=models.CASCADE, default=0,null=True, blank=True)
+    owner_for_reset_password = models.ForeignKey(User, on_delete=models.CASCADE, default=0,null=True,blank=True)
     code = models.IntegerField(default=0)
     verificator_page_id = models.CharField(default=0, max_length=14)
     date = models.DateField(default=datetime.datetime.now())
@@ -45,6 +46,14 @@ class Profile(models.Model):
     id = models.IntegerField(primary_key=True)
     user_flag = models.BooleanField(default=False, blank=False)
     is_user = models.BooleanField(default=True, blank=False)
+    code_for_password = models.CharField(default=0, max_length=14)
+
+    def set_code_for_password(self, code):
+        self.code_for_password = code
+
+    def get_code_for_password(self):
+        return self.code_for_password
+
 
 
     # avatar = models.ImageField(upload_to='static/Users/data/photos/',default='static/Users/data/photos/temp.jpg',blank=False)
@@ -132,6 +141,8 @@ class Teem(models.Model):
 class Univer_Profile(models.Model):
     id = models.OneToOneField(User, on_delete=models.CASCADE, default=None, primary_key=True)
     active = models.BooleanField(default=False, blank=False)
+    code_for_password = models.CharField(default=0, max_length=14)
+
 
     univers_name = models.CharField(max_length=200, blank=True)
     description = models.CharField(max_length=500, blank=True)
@@ -144,6 +155,12 @@ class Univer_Profile(models.Model):
     link = models.CharField(max_length=200, blank=True)
 
     flag = models.BooleanField(default=False, blank=True)
+
+    def set_code_for_password(self, code):
+        self.code_for_password = code
+
+    def get_code_for_password(self):
+        return self.code_for_password
 
 
 
@@ -193,6 +210,15 @@ class Open_Position_for_Cl(models.Model):
 class Tutor(models.Model):
     id = models.OneToOneField(User, on_delete=models.CASCADE, default=None, primary_key=True)
     active = models.BooleanField(default=False, blank=False)
+    code_for_password = models.CharField(default=0, max_length=14)
+    def set_code_for_password(self,code):
+        self.code_for_password = code
+    def get_code_for_password(self):
+        return self.code_for_password
+
+
+
+
 
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
