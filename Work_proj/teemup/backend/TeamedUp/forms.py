@@ -335,3 +335,41 @@ class User_Teem_Form(forms.ModelForm):
             'link',
             'flag',
         )
+
+class Verificator_Form(forms.ModelForm):
+    code = forms.IntegerField(widget=forms.TextInput(attrs={'class': 'form-control ps-5'}))
+
+    class Meta:
+        model = Teem
+        fields = (
+            'code',
+        )
+        
+class Sport_Tag_Form(forms.ModelForm):
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control ps-5'}))
+
+    class Meta:
+        model = Teem
+        fields = (
+            'name',
+        )
+
+class Sport_Position_Tag_Form(forms.ModelForm):
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control ps-5'}))
+
+    class Meta:
+        model = Teem
+        fields = (
+            'name',
+        )
+
+class Language_Tag_Form(forms.ModelForm):
+    name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control ps-5'}))
+
+    class Meta:
+        model = Teem
+        fields = (
+            'name',
+        )
+
+
